@@ -1,52 +1,42 @@
-// Create canvas
+// Create the canvas
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = 512;
 canvas.height = 480;
 document.body.appendChild(canvas);
 
-//Background image
+// Background image
 var bgReady = false;
 var bgImage = new Image();
 bgImage.onload = function () {
 	bgReady = true;
 };
-bgImage.src = "GoblinHunt/background.png";
+bgImage.src = "images/background.png";
 
-
-//Hero image
+// Hero image
 var heroReady = false;
 var heroImage = new Image();
 heroImage.onload = function () {
 	heroReady = true;
 };
-heroImage.src = "GoblinHunt/hero.png";
+heroImage.src = "images/hero.png";
 
-
-//Goblin image
-var goblinReady = false;
-var goblinImage = new Image();
-goblinImage.onload = function () {
-	goblinReady = true;
+// Monster image
+var monsterReady = false;
+var monsterImage = new Image();
+monsterImage.onload = function () {
+	monsterReady = true;
 };
-goblinImage.src = "GoblinHunt/goblin.png";
+monsterImage.src = "images/monster.png";
 
-//Game objects
+// Game objects
 var hero = {
-	speed: 256, //movement in pixels per second
-	x: 0,
-	y: 0
+	speed: 256 // movement in pixels per second
 };
+var monster = {};
+var monstersCaught = 0;
 
-var goblin = {
-	x: 0,
-	y: 0
-};
-
-var goblinsCaught = 0;
-
-
-//Keyboard controls
+// Handle keyboard controls
 var keysDown = {};
 
 addEventListener("keydown", function (e) {
@@ -57,47 +47,44 @@ addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
-
-//Reset game when player catches goblin
+// Reset the game when the player catches a monster
 var reset = function () {
 	hero.x = canvas.width / 2;
-	her.y = canvas.height /2;
+	hero.y = canvas.height / 2;
 
-	//Respawn goblin in random position
-	goblin.x = 32 + (Math.random() * (canvas.width - 64));
-	goblin.y = 32 + (Math.random() * (canvas.height - 64));
+	// Throw the monster somewhere on the screen randomly
+	monster.x = 32 + (Math.random() * (canvas.width - 64));
+	monster.y = 32 + (Math.random() * (canvas.height - 64));
 };
 
-
-//Update game objects
+// Update game objects
 var update = function (modifier) {
-	if (38 in keysDown) {//Player holding up
+	if (38 in keysDown) { // Player holding up
 		hero.y -= hero.speed * modifier;
 	}
-	if (40 in keysDown) {//Player holding down
+	if (40 in keysDown) { // Player holding down
 		hero.y += hero.speed * modifier;
 	}
-	if (37 in KeysDown) {//Player holding left
+	if (37 in keysDown) { // Player holding left
 		hero.x -= hero.speed * modifier;
 	}
-	if (39 in keysDown) {//Player holding right
+	if (39 in keysDown) { // Player holding right
 		hero.x += hero.speed * modifier;
 	}
 
-	//Are they touching?
+	// Are they touching?
 	if (
-		hero.x <= (goblin.x + 32)
-		&& goblin.x <= (hero.x + 32)
-		&& hero.y <= (goblin.y + 32)
-		&& goblin.y <= (hero.y + 32)
-		) {
-		++goblinsCaught;
+		hero.x <= (monster.x + 32)
+		&& monster.x <= (hero.x + 32)
+		&& hero.y <= (monster.y + 32)
+		&& monster.y <= (hero.y + 32)
+	) {
+		++monstersCaught;
 		reset();
 	}
 };
 
-
-//Draw everything
+// Draw everything
 var render = function () {
 	if (bgReady) {
 		ctx.drawImage(bgImage, 0, 0);
@@ -107,20 +94,19 @@ var render = function () {
 		ctx.drawImage(heroImage, hero.x, hero.y);
 	}
 
-	if (goblinReady) {
-		ctx.drawImage(goblinImage, goblin.x, goblin.y);
+	if (monsterReady) {
+		ctx.drawImage(monsterImage, monster.x, monster.y);
 	}
 
-	//Score
+	// Score
 	ctx.fillStyle = "rgb(250, 250, 250)";
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("Goblins Caught: " + goblinsCaught, 32, 32);
+	ctx.fillText("Goblins caught: " + monstersCaught, 32, 32);
 };
 
-
-//The main game loop
+// The main game loop
 var main = function () {
 	var now = Date.now();
 	var delta = now - then;
@@ -130,17 +116,15 @@ var main = function () {
 
 	then = now;
 
-	//Request to do this again ASAP
+	// Request to do this again ASAP
 	requestAnimationFrame(main);
 };
 
-
-//Cross-browser support for requestAnimationFrame
+// Cross-browser support for requestAnimationFrame
 var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
-
-//Let's play the game!
+// Let's play this game!
 var then = Date.now();
 reset();
 main();
